@@ -22,4 +22,4 @@ erl_crash.dump
 # Ignore package tarball (built via "mix hex.build").
 imageflow_ex-*.tar
 
-native/imageflow_ex/target/
+priv/native/*.so
