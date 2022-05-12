@@ -1,6 +1,6 @@
 [package]
 name = "imageflow_ex"
-version = "0.2.0"
+version = "0.3.0"
 authors = []
 edition = "2018"
 
@@ -12,5 +12,5 @@ crate-type = ["dylib"]
 [dependencies]
 rustler = "0.25.0"
 lazy_static = "1.0"
-imageflow_core = { git = "https://github.com/imazen/imageflow", tag = "v1.5.4-rc58" }
-imageflow_types = { git = "https://github.com/imazen/imageflow", tag = "v1.5.4-rc58" }
+imageflow_core = { git = "https://github.com/imazen/imageflow", tag = "v1.5.8-rc62" }
+imageflow_types = { git = "https://github.com/imazen/imageflow", tag = "v1.5.8-rc62" }

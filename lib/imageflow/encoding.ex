@@ -1,4 +1,4 @@
-defimpl Jason.Encoder, for: Imageflow.Graph do
+defimpl Jason.Encoder, for: Imageflow do
   def encode(%{inputs: inputs, outputs: outputs, nodes: nodes, edges: edges}, opts) do
     %{
       io: encode_io(inputs, :in) ++ encode_io(outputs, :out),

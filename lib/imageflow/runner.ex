@@ -1,7 +1,7 @@
-defmodule Imageflow.GraphRunner do
-  alias Imageflow.{Graph, Native}
+defmodule Imageflow.Runner do
+  alias Imageflow.{Native}
 
-  def run(%Graph{} = graph) do
+  def run(%Imageflow{} = graph) do
     with {:ok, job} <- Native.create(),
          :ok <- add_inputs(job, graph.inputs),
          :ok <- add_outputs(job, graph.outputs),
