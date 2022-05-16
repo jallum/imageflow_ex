@@ -69,7 +69,9 @@ defmodule Imageflow.Native do
 
   @spec message(t, binary, binary) :: {:ok, any} | {:error, binary}
   def message(%__MODULE__{id: id}, method, message) do
-    with {:ok, resp} <- NIF.job_message(id, method, Jason.encode!(message)) do
+    json = Jason.encode!(message)
+
+    with {:ok, resp} <- NIF.job_message(id, method, json) do
       {:ok, Jason.decode!(resp)}
     end
   end

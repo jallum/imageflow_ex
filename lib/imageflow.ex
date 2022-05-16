@@ -52,15 +52,13 @@ defmodule Imageflow do
 
   alias __MODULE__.{Runner}
 
-  defstruct [
-    inputs: %{},
-    outputs: %{},
-    nodes: %{},
-    edges: [],
-    node_count: 0,
-    io_count: 0,
-    tip: 0
-  ]
+  defstruct inputs: %{},
+            outputs: %{},
+            nodes: %{},
+            edges: [],
+            node_count: 0,
+            io_count: 0,
+            tip: 0
 
   @type t :: %__MODULE__{
           inputs: map(),
@@ -78,6 +76,28 @@ defmodule Imageflow do
   @spec new :: t
   def new do
     %__MODULE__{}
+  end
+
+  @doc """
+  Starts a flow from an input binary to be decoded
+  """
+  @spec from_binary(binary | atom) :: t
+  def from_binary(path_or_atom) do
+    new()
+    |> from_binary(path_or_atom)
+  end
+
+  @doc """
+  Appends a new input binary to be decoded
+  """
+  @spec from_binary(t, binary | atom) :: t
+  def from_binary(%{io_count: io_count} = flow, binary)
+      when is_binary(binary) or is_atom(binary) do
+    io_id = io_count + 1
+
+    flow
+    |> add_input(io_id, {:binary, binary})
+    |> append_node(%{decode: %{io_id: io_id}})
   end
 
   @doc """
@@ -122,14 +142,23 @@ defmodule Imageflow do
 
   Check the official [encoding documentation](https://docs.imageflow.io/json/encode.html) to see the parameters available to each encoder
   """
-  @spec to_file(t, binary, binary | atom, map) :: t
-  def to_file(%{io_count: io_count} = flow, path, encoder \\ :png, opts \\ %{}) do
+  @spec to_file(t, binary | atom, binary | atom, map) :: t
+  def to_file(%{io_count: io_count} = flow, file, encoder \\ :png, opts \\ %{}) do
     io_id = io_count + 1
-    preset = opts[:preset] || preset_for(encoder, opts)
 
     flow
-    |> add_output(io_id, {:file, path})
-    |> append_node(%{encode: %{io_id: io_id, preset: preset}})
+    |> add_output(io_id, {:file, file})
+    |> append_node(%{encode: %{io_id: io_id, preset: preset_for(encoder, opts)}})
+  end
+
+  @spec to_binary(t, atom, binary | atom, map) :: t
+  def to_binary(%{io_count: io_count} = flow, atom, encoder \\ :png, opts \\ %{})
+      when is_atom(atom) do
+    io_id = io_count + 1
+
+    flow
+    |> add_output(io_id, {:binary, atom})
+    |> append_node(%{encode: %{io_id: io_id, preset: preset_for(encoder, opts)}})
   end
 
   @doc """
@@ -320,8 +349,8 @@ defmodule Imageflow do
     %{flow | nodes: nodes, edges: edges, tip: node_id, node_count: node_count + 1}
   end
 
-  def run(flow) do
-    Runner.run(flow)
+  def run(flow, opts \\ []) do
+    Runner.run(flow, opts)
   end
 
   defp add_input(%{io_count: io_count, inputs: inputs} = flow, io_id, value) do

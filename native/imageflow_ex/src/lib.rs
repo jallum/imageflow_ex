@@ -1,6 +1,6 @@
 extern crate imageflow_types;
 
-use rustler::{Binary, Encoder, Env, Error, Term};
+use rustler::{OwnedBinary, Binary, Encoder, Env, Error, Term};
 
 mod job;
 
@@ -67,8 +67,12 @@ pub fn job_add_output_buffer<'a>(env: Env<'a>, job_id: usize, io_id: i32) -> Res
 #[rustler::nif]
 pub fn job_get_output_buffer<'a>(env: Env<'a>, job_id: usize, io_id: i32) -> Result<Term<'a>, Error> {
     match job!(job_id).get_output_buffer(io_id) {
-        Ok(buffer) => Ok((atoms::ok().to_term(env), buffer).encode(env)),
-        Err(msg) => Ok((atoms::error(), msg).encode(env)),
+        Ok(buffer) => {
+            let mut erl_bin: OwnedBinary = OwnedBinary::new(buffer.len()).unwrap();
+            erl_bin.as_mut_slice().copy_from_slice(&buffer[..]);
+            Ok((atoms::ok(), erl_bin.release(env)).encode(env))
+        },
+        Err(msg) => Ok((atoms::error().to_term(env), msg.to_string()).encode(env)),
     }
 }
 
