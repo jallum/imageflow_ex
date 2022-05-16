@@ -1,6 +1,6 @@
 # ImageflowEx
 
-[![Github Actions Status](https://github.com/naps62/imageflow_ex/workflows/Test%20Suite/badge.svg)](https://github.com/naps62/imageflow_ex/actions)
+[![Github Actions Status](https://github.com/jallum/imageflow_ex/workflows/Test%20Suite/badge.svg)](https://github.com/jallum/imageflow_ex/actions)
 [![Hex pm](http://img.shields.io/hexpm/v/imageflow.svg?style=flat)](https://hex.pm/packages/imageflow)
 
 [imageflow-github]: https://github.com/imazen/imageflow
@@ -16,7 +16,7 @@ Add the package to your `mix.exs`:
 ```elixir
 def deps do
   [
-    {:imageflow, "~> 0.4.1"}
+    {:imageflow, "~> 0.5.0"}
   ]
 end
 ```
@@ -25,31 +25,23 @@ end
 
 There are two main ways of using `imageflow_ex`:
 
-* [`Imageflow.Graph`](https://hexdocs.pm/imageflow/Imageflow.Graph.html), which is the high-level graph-like API, inspired by [Imageflow.NET](https://github.com/imazen/imageflow-dotnet)
-* [`Imageflow.Native`](https://hexdocs.pm/imageflow/Imageflow.Native.html) which provides lower-level access to Rust binding. Shouldn't be needed unless you need really specific features which aren't yet implemented in the Graph API (but please open an issue so the API can evolve).
+* [`Imageflow`](https://hexdocs.pm/imageflow/Imageflow.html), which is the high-level graph-like API, inspired by [Imageflow.NET](https://github.com/imazen/imageflow-dotnet)
 
-Using the Graph API allows you to create processing pipelines to process your
-images:
-
+You can easily create processing pipelines to process your images:
 
 ```elixir
-alias Imageflow.Graph
+flow =
+  Imageflow.from_file(:in)          # read from a file placeholder
+  |> Imageflow.constrain(200, 200)  # constrain image to 200x200
+  |> Imageflow.saturation(0.5)      # set saturation to 0.5 (-1..1 range)
+  |> Imageflow.to_file(:out)        # specify output file
 
-Graph.new()
-|> Graph.decode_file("input.png")     # read input.png
-|> Graph.constrain(200, 200)          # constrain image to 200x200
-|> Graph.saturation(0.5)              # set saturation to 0.5 (-1..1 range)
-|> Graph.encode_to_file("output.png") # specify output file
-|> Graph.run()                        # run the job
+flow
+|> Imageflow.run([in: "input.png", out: "output.png"]) # run the job, defining ":in" as "input.png" and ":out" as "output.png"
+
+flow
+|> Imageflow.run([in: "other.png", out: "output.png"]) # run the job, defining ":in" as "other.png" and ":out" as "output.png"
 ```
-
-### Low-level API
-
-This provides direct access to NIF bindings. You probably don't need this,
-unless you're relying on APIs that are not yet supported by the Graph API
-(please submit an issue).
-
-Check `Imageflow.Native` for documentation and examples.
 
 ## Contributing
 
