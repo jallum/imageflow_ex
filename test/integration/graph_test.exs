@@ -1,37 +1,37 @@
 defmodule Imageflow.Integration.GraphTest do
   use ExUnit.Case
 
-  alias Imageflow.{Graph, Native}
+  alias Imageflow.{Native}
 
   @input_path "test/fixtures/elixir-logo.jpg"
   @output_path "/tmp/output.png"
 
   test "can pipe multiple operations" do
-    assert :ok =
-             Graph.new()
-             |> Graph.decode_file(@input_path)
-             |> Graph.constrain(20, 20)
-             |> Graph.rotate_270()
-             |> Graph.transpose()
-             |> Graph.color_filter("invert")
-             |> Graph.encode_to_file(@output_path)
-             |> Graph.run()
+    assert {:ok, %{"/tmp/output.png" => :ok}} =
+             Imageflow.new()
+             |> Imageflow.from_file(@input_path)
+             |> Imageflow.constrain(20, 20)
+             |> Imageflow.rotate_270()
+             |> Imageflow.transpose()
+             |> Imageflow.color_filter("invert")
+             |> Imageflow.to_file(@output_path)
+             |> Imageflow.run()
   end
 
   test "can generate multiple images" do
-    Graph.new()
-    |> Graph.decode_file(@input_path)
-    |> Graph.branch(fn graph ->
-      graph
-      |> Graph.constrain(20, nil)
-      |> Graph.encode_to_file("/tmp/20x20.png")
+    Imageflow.new()
+    |> Imageflow.from_file(@input_path)
+    |> Imageflow.branch(fn flow ->
+      flow
+      |> Imageflow.constrain(20, nil)
+      |> Imageflow.to_file("/tmp/20x20.png")
     end)
-    |> Graph.branch(fn graph ->
-      graph
-      |> Graph.constrain(nil, 10)
-      |> Graph.encode_to_file("/tmp/10x10.png")
+    |> Imageflow.branch(fn flow ->
+      flow
+      |> Imageflow.constrain(nil, 10)
+      |> Imageflow.to_file("/tmp/10x10.png")
     end)
-    |> Graph.run()
+    |> Imageflow.run()
 
     job = Native.create!()
     :ok = Native.add_input_file(job, 0, "/tmp/20x20.png")
@@ -47,12 +47,12 @@ defmodule Imageflow.Integration.GraphTest do
   end
 
   test "can handle multiple operations" do
-    assert :ok =
-             Graph.new()
-             |> Graph.decode_file(@input_path)
-             |> Graph.flip_vertical()
-             |> Graph.transpose()
-             |> Graph.encode_to_file("/tmp/rotated.png")
-             |> Graph.run()
+    assert {:ok, %{"/tmp/rotated.png" => :ok}} =
+             Imageflow.new()
+             |> Imageflow.from_file(@input_path)
+             |> Imageflow.flip_vertical()
+             |> Imageflow.transpose()
+             |> Imageflow.to_file("/tmp/rotated.png")
+             |> Imageflow.run()
   end
 end

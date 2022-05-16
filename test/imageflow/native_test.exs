@@ -80,7 +80,7 @@ defmodule Imageflow.NativeTest do
              } = resp
 
       assert {:ok, bytes} = Native.get_output_buffer(job, 1)
-      assert [0xFF, 0xD8, 0xFF | _] = bytes
+      assert <<0xFF, 0xD8, 0xFF>> <> _ = bytes
     end
   end
 

@@ -1,135 +1,133 @@
-defmodule Imageflow.GraphTest do
+defmodule Imageflow.Test do
   use ExUnit.Case
 
-  alias Imageflow.Graph
-
   describe "new/0" do
-    test "returns a new graph instance" do
-      assert %Graph{} = Graph.new()
+    test "returns a new flow instance" do
+      assert %Imageflow{} = Imageflow.new()
     end
   end
 
-  describe "decode_file/1" do
+  describe "from_file/1" do
     test "appends a new input" do
-      graph = Graph.new() |> Graph.decode_file("file.png")
+      flow = Imageflow.new() |> Imageflow.from_file("file.png")
 
-      assert %{io_count: 1, inputs: %{1 => {:file, "file.png"}}} = graph
+      assert %{io_count: 1, inputs: %{1 => {:file, "file.png"}}} = flow
     end
 
     test "appends a file decoding operation" do
-      graph = Graph.new() |> Graph.decode_file("file.png")
+      flow = Imageflow.new() |> Imageflow.from_file("file.png")
 
-      assert %{nodes: %{1 => %{decode: %{io_id: 1}}}} = graph
+      assert %{nodes: %{1 => %{decode: %{io_id: 1}}}} = flow
     end
   end
 
-  describe "encode_file/1" do
+  describe "to_file/1" do
     test "appends a new output" do
-      graph = Graph.new() |> Graph.encode_to_file("file.png")
+      flow = Imageflow.new() |> Imageflow.to_file("file.png")
 
-      assert %{io_count: 1, outputs: %{1 => {:file, "file.png"}}} = graph
+      assert %{io_count: 1, outputs: %{1 => {:file, "file.png"}}} = flow
     end
 
     test "appends a file encoding operation" do
-      graph = Graph.new() |> Graph.encode_to_file("file.png")
+      flow = Imageflow.new() |> Imageflow.to_file("file.png")
 
-      assert %{nodes: %{1 => %{encode: %{io_id: 1}}}} = graph
+      assert %{nodes: %{1 => %{encode: %{io_id: 1}}}} = flow
     end
 
     test "allows appending jpg outputs" do
-      graph = Graph.new() |> Graph.encode_to_file("file.jpg", :jpg)
+      flow = Imageflow.new() |> Imageflow.to_file("file.jpg", :jpg)
 
-      assert %{nodes: %{1 => %{encode: %{io_id: 1, preset: %{mozjpeg: %{quality: 90}}}}}} = graph
+      assert %{nodes: %{1 => %{encode: %{io_id: 1, preset: %{mozjpeg: %{quality: 90}}}}}} = flow
     end
 
     test "allows appending jpg outputs with custom parameters" do
-      graph = Graph.new() |> Graph.encode_to_file("file.jpg", :jpg, %{quality: 10})
+      flow = Imageflow.new() |> Imageflow.to_file("file.jpg", :jpg, %{quality: 10})
 
-      assert %{nodes: %{1 => %{encode: %{io_id: 1, preset: %{mozjpeg: %{quality: 10}}}}}} = graph
+      assert %{nodes: %{1 => %{encode: %{io_id: 1, preset: %{mozjpeg: %{quality: 10}}}}}} = flow
     end
 
     test "allows appending png outputs" do
-      graph = Graph.new() |> Graph.encode_to_file("file.jpg", :png)
+      flow = Imageflow.new() |> Imageflow.to_file("file.jpg", :png)
 
       assert %{
                nodes: %{
                  1 => %{encode: %{io_id: 1, preset: %{lodepng: %{maximum_deflate: false}}}}
                }
-             } = graph
+             } = flow
     end
 
     test "allows appending png outputs with custom parameters" do
-      graph = Graph.new() |> Graph.encode_to_file("file.jpg", :png, %{maximum_deflate: true})
+      flow = Imageflow.new() |> Imageflow.to_file("file.jpg", :png, %{maximum_deflate: true})
 
       assert %{
                nodes: %{1 => %{encode: %{io_id: 1, preset: %{lodepng: %{maximum_deflate: true}}}}}
-             } = graph
+             } = flow
     end
 
     test "allows appending gif outputs" do
-      graph = Graph.new() |> Graph.encode_to_file("file.gif", :gif)
+      flow = Imageflow.new() |> Imageflow.to_file("file.gif", :gif)
 
-      assert %{nodes: %{1 => %{encode: %{io_id: 1, preset: :gif}}}} = graph
+      assert %{nodes: %{1 => %{encode: %{io_id: 1, preset: :gif}}}} = flow
     end
 
     test "allows appending gif outputs with custom parameters" do
-      graph = Graph.new() |> Graph.encode_to_file("file.jpg", :gif, %{a: :b})
+      flow = Imageflow.new() |> Imageflow.to_file("file.jpg", :gif, %{a: :b})
 
-      assert %{nodes: %{1 => %{encode: %{io_id: 1, preset: :gif}}}} = graph
+      assert %{nodes: %{1 => %{encode: %{io_id: 1, preset: :gif}}}} = flow
     end
 
     test "allows appending webp outputs" do
-      graph = Graph.new() |> Graph.encode_to_file("file.webp", :webp)
+      flow = Imageflow.new() |> Imageflow.to_file("file.webp", :webp)
 
-      assert %{nodes: %{1 => %{encode: %{io_id: 1, preset: :webplossless}}}} = graph
+      assert %{nodes: %{1 => %{encode: %{io_id: 1, preset: :webplossless}}}} = flow
     end
 
     test "allows appending webp outputs with custom parameters" do
-      graph = Graph.new() |> Graph.encode_to_file("file.webp", :webp, %{a: :b})
+      flow = Imageflow.new() |> Imageflow.to_file("file.webp", :webp, %{a: :b})
 
-      assert %{nodes: %{1 => %{encode: %{io_id: 1, preset: :webplossless}}}} = graph
+      assert %{nodes: %{1 => %{encode: %{io_id: 1, preset: :webplossless}}}} = flow
     end
   end
 
   describe "constrain/4" do
     test "appends a constrain operation" do
-      graph = Graph.new() |> Graph.constrain(10, 20)
+      flow = Imageflow.new() |> Imageflow.constrain(10, 20)
 
-      assert %{nodes: %{1 => %{constrain: %{w: 10, h: 20, mode: "within"}}}} = graph
+      assert %{nodes: %{1 => %{constrain: %{w: 10, h: 20, mode: "within"}}}} = flow
     end
 
     test "allows overriding the mode" do
-      graph = Graph.new() |> Graph.constrain(10, 20, %{mode: "fit"})
+      flow = Imageflow.new() |> Imageflow.constrain(10, 20, %{mode: "fit"})
 
-      assert %{nodes: %{1 => %{constrain: %{w: 10, h: 20, mode: "fit"}}}} = graph
+      assert %{nodes: %{1 => %{constrain: %{w: 10, h: 20, mode: "fit"}}}} = flow
     end
   end
 
   describe "region/4" do
     test "appends a region operation" do
-      graph = Graph.new() |> Graph.region(1, 2, 3, 4)
+      flow = Imageflow.new() |> Imageflow.region(1, 2, 3, 4)
 
       assert %{
                nodes: %{
                  1 => %{region: %{x1: 1, y1: 2, x2: 3, y2: 4, background_color: "transparent"}}
                }
-             } = graph
+             } = flow
     end
 
     test "acepts an optional background color" do
-      graph = Graph.new() |> Graph.region(1, 2, 3, 4, "FF000000")
+      flow = Imageflow.new() |> Imageflow.region(1, 2, 3, 4, "FF000000")
 
       assert %{
                nodes: %{
                  1 => %{region: %{x1: 1, y1: 2, x2: 3, y2: 4, background_color: "FF000000"}}
                }
-             } = graph
+             } = flow
     end
   end
 
   describe "region_percent/4" do
     test "appends a region_percent operation" do
-      graph = Graph.new() |> Graph.region_percent(1, 2, 3, 4)
+      flow = Imageflow.new() |> Imageflow.region_percent(1, 2, 3, 4)
 
       assert %{
                nodes: %{
@@ -137,11 +135,11 @@ defmodule Imageflow.GraphTest do
                    region_percent: %{x1: 1, y1: 2, x2: 3, y2: 4, background_color: "transparent"}
                  }
                }
-             } = graph
+             } = flow
     end
 
     test "acepts an optional background color" do
-      graph = Graph.new() |> Graph.region_percent(1, 2, 3, 4, "FF000000")
+      flow = Imageflow.new() |> Imageflow.region_percent(1, 2, 3, 4, "FF000000")
 
       assert %{
                nodes: %{
@@ -149,83 +147,83 @@ defmodule Imageflow.GraphTest do
                    region_percent: %{x1: 1, y1: 2, x2: 3, y2: 4, background_color: "FF000000"}
                  }
                }
-             } = graph
+             } = flow
     end
   end
 
   describe "crop_whitespace/3" do
     test "appends a crop_whitespace operation" do
-      graph = Graph.new() |> Graph.crop_whitespace(1, 2)
+      flow = Imageflow.new() |> Imageflow.crop_whitespace(1, 2)
 
-      assert %{nodes: %{1 => %{crop_whitespace: %{threshold: 1, percent_padding: 2}}}} = graph
+      assert %{nodes: %{1 => %{crop_whitespace: %{threshold: 1, percent_padding: 2}}}} = flow
     end
   end
 
   describe "flip_horizontal/1" do
     test "appends a flip_h operation" do
-      graph = Graph.new() |> Graph.flip_horizontal()
+      flow = Imageflow.new() |> Imageflow.flip_horizontal()
 
-      assert %{nodes: %{1 => :flip_h}} = graph
+      assert %{nodes: %{1 => :flip_h}} = flow
     end
   end
 
   describe "flip_vertical/1" do
     test "appends a flip_h operation" do
-      graph = Graph.new() |> Graph.flip_vertical()
+      flow = Imageflow.new() |> Imageflow.flip_vertical()
 
-      assert %{nodes: %{1 => :flip_v}} = graph
+      assert %{nodes: %{1 => :flip_v}} = flow
     end
   end
 
   describe "transpose/1" do
     test "appends a flip_h operation" do
-      graph = Graph.new() |> Graph.transpose()
+      flow = Imageflow.new() |> Imageflow.transpose()
 
-      assert %{nodes: %{1 => :transpose}} = graph
+      assert %{nodes: %{1 => :transpose}} = flow
     end
   end
 
   describe "rotate_90/1" do
     test "appends a flip_h operation" do
-      graph = Graph.new() |> Graph.rotate_90()
+      flow = Imageflow.new() |> Imageflow.rotate_90()
 
-      assert %{nodes: %{1 => :rotate_90}} = graph
+      assert %{nodes: %{1 => :rotate_90}} = flow
     end
   end
 
   describe "rotate_180/1" do
     test "appends a flip_h operation" do
-      graph = Graph.new() |> Graph.rotate_180()
+      flow = Imageflow.new() |> Imageflow.rotate_180()
 
-      assert %{nodes: %{1 => :rotate_180}} = graph
+      assert %{nodes: %{1 => :rotate_180}} = flow
     end
   end
 
   describe "rotate_270/1" do
     test "appends a flip_h operation" do
-      graph = Graph.new() |> Graph.rotate_270()
+      flow = Imageflow.new() |> Imageflow.rotate_270()
 
-      assert %{nodes: %{1 => :rotate_270}} = graph
+      assert %{nodes: %{1 => :rotate_270}} = flow
     end
   end
 
   describe "fill_rect/4" do
     test "appends a fill_rect operation" do
-      graph = Graph.new() |> Graph.fill_rect(1, 2, 3, 4)
+      flow = Imageflow.new() |> Imageflow.fill_rect(1, 2, 3, 4)
 
-      assert %{nodes: %{1 => %{fill_rect: %{x1: 1, y1: 2, x2: 3, y2: 4, color: "black"}}}} = graph
+      assert %{nodes: %{1 => %{fill_rect: %{x1: 1, y1: 2, x2: 3, y2: 4, color: "black"}}}} = flow
     end
 
     test "accepts an optional color" do
-      graph = Graph.new() |> Graph.fill_rect(1, 2, 3, 4, "red")
+      flow = Imageflow.new() |> Imageflow.fill_rect(1, 2, 3, 4, "red")
 
-      assert %{nodes: %{1 => %{fill_rect: %{x1: 1, y1: 2, x2: 3, y2: 4, color: "red"}}}} = graph
+      assert %{nodes: %{1 => %{fill_rect: %{x1: 1, y1: 2, x2: 3, y2: 4, color: "red"}}}} = flow
     end
   end
 
   describe "expand_canvas/6" do
     test "appends a expand_canvas operation" do
-      graph = Graph.new() |> Graph.expand_canvas(1, 2, 3, 4)
+      flow = Imageflow.new() |> Imageflow.expand_canvas(1, 2, 3, 4)
 
       assert %{
                nodes: %{
@@ -239,11 +237,11 @@ defmodule Imageflow.GraphTest do
                    }
                  }
                }
-             } = graph
+             } = flow
     end
 
     test "accepts an optional color argument" do
-      graph = Graph.new() |> Graph.expand_canvas(1, 2, 3, 4, "FF000000")
+      flow = Imageflow.new() |> Imageflow.expand_canvas(1, 2, 3, 4, "FF000000")
 
       assert %{
                nodes: %{
@@ -257,47 +255,47 @@ defmodule Imageflow.GraphTest do
                    }
                  }
                }
-             } = graph
+             } = flow
     end
   end
 
   describe "transparency/2" do
     test "appends a color_filter_srgb contrast operation" do
-      graph = Graph.new() |> Graph.transparency(10)
+      flow = Imageflow.new() |> Imageflow.transparency(10)
 
-      assert %{nodes: %{1 => %{color_filter_srgb: %{alpha: 10}}}} = graph
+      assert %{nodes: %{1 => %{color_filter_srgb: %{alpha: 10}}}} = flow
     end
   end
 
   describe "contrast/2" do
     test "appends a color_filter_srgb contrast operation" do
-      graph = Graph.new() |> Graph.contrast(10)
+      flow = Imageflow.new() |> Imageflow.contrast(10)
 
-      assert %{nodes: %{1 => %{color_filter_srgb: %{contrast: 10}}}} = graph
+      assert %{nodes: %{1 => %{color_filter_srgb: %{contrast: 10}}}} = flow
     end
   end
 
   describe "brightness/2" do
     test "appends a color_filter_srgb contrast operation" do
-      graph = Graph.new() |> Graph.brightness(10)
+      flow = Imageflow.new() |> Imageflow.brightness(10)
 
-      assert %{nodes: %{1 => %{color_filter_srgb: %{brightness: 10}}}} = graph
+      assert %{nodes: %{1 => %{color_filter_srgb: %{brightness: 10}}}} = flow
     end
   end
 
   describe "saturation/2" do
     test "appends a color_filter_srgb contrast operation" do
-      graph = Graph.new() |> Graph.saturation(10)
+      flow = Imageflow.new() |> Imageflow.saturation(10)
 
-      assert %{nodes: %{1 => %{color_filter_srgb: %{saturation: 10}}}} = graph
+      assert %{nodes: %{1 => %{color_filter_srgb: %{saturation: 10}}}} = flow
     end
   end
 
   describe "color_filter/2" do
     test "appends a generic color_filter_srgb operation" do
-      graph = Graph.new() |> Graph.color_filter(%{alpha: 0})
+      flow = Imageflow.new() |> Imageflow.color_filter(%{alpha: 0})
 
-      assert %{nodes: %{1 => %{color_filter_srgb: %{alpha: 0}}}} = graph
+      assert %{nodes: %{1 => %{color_filter_srgb: %{alpha: 0}}}} = flow
     end
   end
 end
